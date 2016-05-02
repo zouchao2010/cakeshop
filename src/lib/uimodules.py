@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 from tornado.web import UIModule
+
 
 class Paginate(UIModule):
     def render(self, total, pagesize, page):

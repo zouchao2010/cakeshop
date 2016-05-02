@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 import pickle
 import hmac
@@ -111,4 +110,3 @@ class Session:
         if self._dirty:
             self._store.set_session(self._sid, self._data, 'data', self._expires)
             self._dirty = False
-    

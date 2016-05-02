@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 from tornado.web import url
 

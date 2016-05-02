@@ -1,10 +1,11 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 import time
 
+
 def datetimeformat(value, fmt='%Y-%m-%d %H:%M:%S'):
     return time.strftime(fmt, time.localtime(value))
+
 
 def truncate_words(s, num=50, end_text='...'):
     s = unicode(s,'utf8')
@@ -14,6 +15,7 @@ def truncate_words(s, num=50, end_text='...'):
         if not s[-1].endswith(end_text):
             s= s+end_text
     return s
+
 
 def null(value):
     return value if value else ""

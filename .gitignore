@@ -1,3 +1,4 @@
 doc/
 *.pyc
+.idea
 .DS_Store

@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 import tornado
+
 
 class FlashMessagesMixin(object):
     @property

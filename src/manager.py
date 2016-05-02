@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 import time
 import signal
@@ -17,6 +16,7 @@ from handler import site, admin, ajax, oauth, shop, pay, user
 define('cmd', default='runserver', metavar='runserver|syncdb')
 define('port', default=8080, type=int)
 
+
 class Application(tornado.web.Application):
     def __init__(self):
         self.jinja_env = jinja_environment
@@ -32,6 +32,7 @@ class Application(tornado.web.Application):
                     tornado.web.url(r"/upload/(.+)", tornado.web.StaticFileHandler, dict(path=settings['upload_path']), name='upload_path')
                     ] + Route.routes()
         tornado.web.Application.__init__(self, handlers, **settings)
+
 
 def syncdb():
     from lib.util import find_subclasses
@@ -62,6 +63,7 @@ def syncdb():
     Page.create(name = '配送范围', slug = 'psfw', content = '')
     
     logging.info('superuser - username:root password:111111')
+
 
 def runserver():
     http_server = HTTPServer(Application(), xheaders=True)
@@ -104,4 +106,3 @@ if __name__ == '__main__':
         syncdb()
     else:
         runserver()
-    

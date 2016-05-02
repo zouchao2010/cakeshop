@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 import os
 from jinja2 import Environment, FileSystemLoader

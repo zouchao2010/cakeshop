@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 from tornado import httpclient, escape
 from tornado.auth import OAuth2Mixin, _auth_return_future, AuthError

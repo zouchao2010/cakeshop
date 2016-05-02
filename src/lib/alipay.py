@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#coding=utf-8
+# -*- coding: utf-8 -*-
 
 import types
 import md5
@@ -146,4 +145,3 @@ class Alipay:
         except Exception, ex:
             logging.error(ex)
         return False
-        

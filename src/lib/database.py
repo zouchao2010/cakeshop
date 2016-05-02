@@ -1,8 +1,8 @@
-#!/usr/bin/env python
-#coding=utf-8
+# -*- coding: utf-8 -*-
 
 import peewee
 from playhouse.signals import Model as _model
+
 
 class Db(object):
     
@@ -75,9 +75,9 @@ class Db(object):
     class DateField(peewee.DateField):
         pass
 
-    def __init__(self,kw):
+    def __init__(self, kw):
         self.config = kw
-        self.load_database();
+        self.load_database()
         self.Model = self.get_model_class()
         
     def load_database(self):

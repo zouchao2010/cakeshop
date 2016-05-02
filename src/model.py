@@ -1,18 +1,20 @@
-#!/usr/bin/env python
-#coding=utf-8
+#  -*- coding: utf-8 -*-
 
 import re
 import time
 import datetime
 import hashlib
 from bootloader import db, memcachedb
-from playhouse.signals import connect, post_save
+from playhouse.signals import post_save
 from lib.util import vmobile
 
-#地区表
+
 class Area(db.Model):
+    """
+    地区表
+    """
     id = db.TinyPrimaryKeyField()
-    pid = db.TinyIntegerField(default = 0)
+    pid = db.TinyIntegerField(default=0)
     name = db.CharField(max_length=30)
     
     def validate(self):
@@ -28,36 +30,42 @@ class Area(db.Model):
             raise Exception('请输入地区名')
     
     class Meta:
-        db_table = 'areas'
+        db_table = 'area'
 
-#首页banner
+
 class Ad(db.Model):
+    """
+    首页banner
+    """
     id = db.TinyPrimaryKeyField()
-    url = db.CharField(max_length = 50) #商品连接地址
+    url = db.CharField(max_length=50) # 商品连接地址
     
     def validate(self):
         if not self.url:
             raise Exception('情输入访问url')
     
     class Meta:
-        db_table = 'ads'
+        db_table = 'ad'
     
-#用户
+
 class User(db.Model):
+    """
+    用户
+    """
     id = db.PrimaryKeyField()
-    mobile = db.CharField(unique = True, max_length = 11, null = False) #注册手机号
-    password = db.CharField(max_length = 32) #密码
-    realname = db.CharField(max_length = 10) #真实姓名
-    gender = db.TinyIntegerField(max_length = 1, default = 2) #性别 0男 1女 2未知
-    qq = db.CharField(max_length = 15) #qq
-    birthday = db.DateField(default = '1980-01-01') #生日
-    tel = db.CharField(max_length = 30) #固定电话
-    credit = db.SmallIntegerField(default = 0) #积分
-    order = db.SmallIntegerField(default = 0) #订单
-    consult = db.SmallIntegerField(default = 0) #咨询
-    group = db.TinyIntegerField(max_length = 1, default = 1, **{'dbdefault' : 1}) #用户组 0被禁止的用户 1正常用户 9管理员
-    signuped = db.IntegerField(default = int(time.time())) #时间
-    lsignined = db.IntegerField(default = int(time.time())) #最后登录时间
+    mobile = db.CharField(unique = True, max_length=11, null = False) # 注册手机号
+    password = db.CharField(max_length=32) # 密码
+    realname = db.CharField(max_length=10) # 真实姓名
+    gender = db.TinyIntegerField(default=2) # 性别 0男 1女 2未知
+    qq = db.CharField(max_length=15) # qq
+    birthday = db.DateField(default='1980-01-01') # 生日
+    tel = db.CharField(max_length=30) # 固定电话
+    credit = db.SmallIntegerField(default=0) # 积分
+    order = db.SmallIntegerField(default=0) # 订单
+    consult = db.SmallIntegerField(default=0) # 咨询
+    group = db.TinyIntegerField(**{'default' : 1}) # 用户组 0被禁止的用户 1正常用户 9管理员
+    signuped = db.IntegerField(default=int(time.time())) # 时间
+    lsignined = db.IntegerField(default=int(time.time())) # 最后登录时间
     
     @staticmethod
     def create_password(raw):
@@ -78,27 +86,33 @@ class User(db.Model):
         self.save()
     
     class Meta:
-        db_table = 'users'
+        db_table = 'user'
 
-#用户联系地址
+
 class UserAddr(db.Model):
+    """
+    用户联系地址
+    """
     id = db.PrimaryKeyField()
-    uid = db.IntegerField(default = 0, index = True)
-    city = db.CharField(max_length = 30) #城市
-    region = db.CharField(max_length = 30) #区域
-    address = db.CharField(max_length = 100) #详细地址
-    name = db.CharField(max_length = 10) #姓名
-    tel = db.CharField(max_length = 30) #固定电话
-    mobile = db.CharField(max_length = 11) #手机号码
+    uid = db.IntegerField(default=0, index=True)
+    city = db.CharField(max_length=30) # 城市
+    region = db.CharField(max_length=30) # 区域
+    address = db.CharField(max_length=100) # 详细地址
+    name = db.CharField(max_length=10) # 姓名
+    tel = db.CharField(max_length=30) # 固定电话
+    mobile = db.CharField(max_length=11) # 手机号码
     
     class Meta:
-        db_table = 'useraddrs'
+        db_table = 'useraddr'
 
-#手机验证码
+
 class UserVcode(db.Model):
-    mobile = db.CharField(max_length = 11, null = False) #注册手机号
-    vcode = db.SmallIntegerField(max_length = 4)
-    created = db.IntegerField(index = True, default = int(time.time()))
+    """
+    手机验证码
+    """
+    mobile = db.CharField(max_length=11, null = False) # 注册手机号
+    vcode = db.SmallIntegerField()
+    created = db.IntegerField(index=True, default=int(time.time()))
     
     def validate(self):
         if self.mobile and vmobile(self.mobile):
@@ -107,29 +121,35 @@ class UserVcode(db.Model):
             raise Exception('mobile is not validate')
         
     class Meta:
-        db_table = 'uservcodes'
+        db_table = 'uservcode'
         indexes = ((('mobile', 'vcode'), True),)
 
-#第三方登录
+
 class Oauth(db.Model):
-    uid = db.IntegerField() #注册用户Id
-    src = db.CharField(max_length = 10, choices = ('weibo', 'alipay'), default = 'weibo') #来源
-    openid = db.CharField(max_length = 50) #第三方平台用户Id
+    """
+    第三方登录
+    """
+    uid = db.IntegerField() # 注册用户Id
+    src = db.CharField(max_length=10, choices = ('weibo', 'alipay'), default='weibo') # 来源
+    openid = db.CharField(max_length=50) # 第三方平台用户Id
     
     class Meta:
-        db_table = 'oauths'
+        db_table = 'oauth'
 
-#免费品尝
+
 class Apply(db.Model):
-    coname = db.CharField(max_length = 80) #公司名称
-    city = db.CharField(max_length = 30) #城市
-    region = db.CharField(max_length = 30) #区域
-    address = db.CharField(max_length = 100) #详细地址
-    pnumber = db.SmallIntegerField(default = 1) #公司人数
-    name = db.CharField(max_length = 10) #姓名
-    tel = db.CharField(max_length = 30) #固定电话
-    mobile = db.CharField(max_length = 11) #手机号码
-    applyed = db.IntegerField(default = int(time.time())) #申请时间
+    """
+    免费品尝
+    """
+    coname = db.CharField(max_length=80) # 公司名称
+    city = db.CharField(max_length=30) # 城市
+    region = db.CharField(max_length=30) # 区域
+    address = db.CharField(max_length=100) # 详细地址
+    pnumber = db.SmallIntegerField(default=1) # 公司人数
+    name = db.CharField(max_length=10) # 姓名
+    tel = db.CharField(max_length=30) # 固定电话
+    mobile = db.CharField(max_length=11) # 手机号码
+    applyed = db.IntegerField(default=int(time.time())) # 申请时间
     
     def validate(self):
         if not self.coname:
@@ -154,15 +174,18 @@ class Apply(db.Model):
             raise Exception('请输入正确的手机号码')
     
     class Meta:
-        db_table = 'applys'
+        db_table = 'apply'
         order_by = ('-applyed',)
 
-#分类
+
 class Category(db.Model):
+    """
+    分类
+    """
     id = db.TinyPrimaryKeyField()
-    name = db.CharField(max_length = 20) #分类名
-    slug = db.CharField(max_length = 20) #访问url
-    order = db.TinyIntegerField(default = 1) #排序
+    name = db.CharField(max_length=20) # 分类名
+    slug = db.CharField(max_length=20) # 访问url
+    order = db.TinyIntegerField(default=1) # 排序
     
     def validate(self):
         if self.name and self.slug:
@@ -185,16 +208,19 @@ class Category(db.Model):
         return Category.select().count() + 1
     
     class Meta:
-        db_table = 'categorys'
+        db_table = 'category'
         order_by = ('order',)
 
-#分类属性
+
 class CategoryAttr(db.Model):
+    """
+    分类属性
+    """
     id = db.SmallPrimaryKeyField()
-    cid = db.TinyIntegerField(index = True) #商品分类
-    name = db.CharField(max_length = 50) #商品参数
-    dec = db.CharField(max_length = 255) #默认值
-    order = db.TinyIntegerField(default = 1) #参数排序
+    cid = db.TinyIntegerField(index=True) # 商品分类
+    name = db.CharField(max_length=50) # 商品参数
+    dec = db.CharField(max_length=255) # 默认值
+    order = db.TinyIntegerField(default=1) # 参数排序
     
     def validate(self):
         if self.cid and self.name:
@@ -214,26 +240,29 @@ class CategoryAttr(db.Model):
         return CategoryAttr.select().where(CategoryAttr.cid == cid).count() + 1
     
     class Meta:
-        db_table = 'categoryattrs'
+        db_table = 'categoryattr'
         order_by = ('order',)
 
-#商品
+
 class Shop(db.Model):
+    """
+    商品
+    """
     id = db.PrimaryKeyField()
-    name = db.CharField(max_length = 80) #商品名称
-    ename = db.CharField(max_length = 100) #商品英文名称
-    price = db.CharField(max_length = 30) #商品价格
-    cid = db.IntegerField() #商品分类
-    level = db.TinyIntegerField(max_length = 1, default = 3) #甜度
-    resume = db.CharField() #简单介绍
-    intro = db.TextField() #详细介绍
-    prompt = db.TextField() #提示
-    args = db.TextField() #参数内容
-    cover = db.CharField(max_length=20) #头图
-    views = db.SmallIntegerField(default = 0) #点击率
-    orders = db.SmallIntegerField(default = 0) #购买次
-    status = db.TinyIntegerField(max_length = 1, default = 0) #是否推荐 0不推荐 1推荐 #9删除
-    created = db.IntegerField(default = int(time.time()))  #添加时间
+    name = db.CharField(max_length=80) # 商品名称
+    ename = db.CharField(max_length=100) # 商品英文名称
+    price = db.CharField(max_length=30) # 商品价格
+    cid = db.IntegerField() # 商品分类
+    level = db.TinyIntegerField(default=3) # 甜度
+    resume = db.CharField() # 简单介绍
+    intro = db.TextField() # 详细介绍
+    prompt = db.TextField() # 提示
+    args = db.TextField() # 参数内容
+    cover = db.CharField(max_length=20) # 头图
+    views = db.SmallIntegerField(default=0) # 点击率
+    orders = db.SmallIntegerField(default=0) # 购买次
+    status = db.TinyIntegerField(default=0) # 是否推荐 0不推荐 1推荐 # 9删除
+    created = db.IntegerField(default=int(time.time()))  # 添加时间
     
     def validate(self):
         if self.name and self.ename and self.cid:
@@ -243,16 +272,19 @@ class Shop(db.Model):
             raise Exception('请输入商品名，英文名或设置所属分类id')
     
     class Meta:
-        db_table = 'shops'
+        db_table = 'shop'
         order_by = ('-created',)
 
-#商品属性
+
 class ShopAttr(db.Model):
+    """
+    商品属性
+    """
     id = db.PrimaryKeyField()
-    sid = db.IntegerField() #商品Id
-    name = db.CharField(max_length = 50) #商品规格
-    price = db.FloatField() #商品价格
-    order = db.TinyIntegerField(default = 1) #规格排序
+    sid = db.IntegerField() # 商品Id
+    name = db.CharField(max_length=50) # 商品规格
+    price = db.FloatField() # 商品价格
+    order = db.TinyIntegerField(default=1) # 规格排序
     
     def validate(self):
         if self.sid and self.name:
@@ -272,38 +304,47 @@ class ShopAttr(db.Model):
         return ShopAttr.select().where(ShopAttr.sid == sid).count() + 1
     
     class Meta:
-        db_table = 'shopattrs'
+        db_table = 'shopattr'
         order_by = ('order',)
 
-#商品附图
+
 class ShopPic(db.Model):
+    """
+    商品附图
+    """
     id = db.PrimaryKeyField()
-    sid = db.IntegerField() #商品Id
+    sid = db.IntegerField() # 商品Id
     path = db.CharField(max_length=20)
     
     class Meta:
-        db_table = 'shoppics'
+        db_table = 'shoppic'
 
-#咨询
+
 class Consult(db.Model):
-    sid = db.IntegerField() #商品Id
-    uid = db.IntegerField(default = 0) #用户Id
-    mobile = db.CharField(max_length = 11) #用户名
-    content = db.TextField() #咨询内容
-    posted = db.IntegerField(default = int(time.time())) #咨询时间
-    reply = db.TextField() #回复内容
-    replyed = db.IntegerField(default = 0) #回复时间
+    """
+    咨询
+    """
+    sid = db.IntegerField() # 商品Id
+    uid = db.IntegerField(default=0) # 用户Id
+    mobile = db.CharField(max_length=11) # 用户名
+    content = db.TextField() # 咨询内容
+    posted = db.IntegerField(default=int(time.time())) # 咨询时间
+    reply = db.TextField() # 回复内容
+    replyed = db.IntegerField(default=0) # 回复时间
     
     class Meta:
-        db_table = 'consults'
+        db_table = 'consult'
 
-#配送方式
+
 class Distribution(db.Model):
+    """
+    配送方式
+    """
     id = db.TinyPrimaryKeyField()
-    pdid = db.TinyIntegerField() #是否为第一级
-    name = db.CharField(max_length = 20) #配送方式名称
-    price = db.FloatField(default = 0.0) #配送价格
-    content = db.CharField() #如果为第二级则有内容选择
+    pdid = db.TinyIntegerField() # 是否为第一级
+    name = db.CharField(max_length=20) # 配送方式名称
+    price = db.FloatField(default=0.0) # 配送价格
+    content = db.CharField() # 如果为第二级则有内容选择
     
     def validate(self):
         if self.name:
@@ -318,48 +359,57 @@ class Distribution(db.Model):
             raise Exception('请输入配送方式')
     
     class Meta:
-        db_table = 'distributions'
+        db_table = 'distribution'
         order_by = ('pdid',)
     
-#订单
-class Order(db.Model):
-    id = db.PrimaryKeyField()
-    uid = db.IntegerField(default = 0) #用户Id
-    mobile = db.CharField(max_length = 11) #注册手机号
-    uaid = db.IntegerField(default = 0) #收件地址
-    distrid = db.TinyIntegerField(default = 0) #配送方式
-    distribbed = db.CharField(max_length=24) #配送时间
-    payment = db.TinyIntegerField(max_length = 1, default = 1) #付款方式 0货到付款  1支付宝
-    message = db.CharField() #付款留言
-    isinvoice = db.TinyIntegerField(max_length = 1, default = 0) #是否开发票
-    invoicesub = db.TinyIntegerField(max_length = 1, default = 0) #发票抬头 0个人 1公司
-    invoicename = db.CharField(max_length = 80) #个人或公司名称
-    invoicecontent = db.TinyIntegerField(max_length = 1, default = 1) #发票类型 0蛋糕 1食品
-    shippingprice = db.FloatField(default = 0.0) #配送价格
-    price = db.FloatField(default = 0.0) #价格
-    status = db.TinyIntegerField(max_length = 1, default = 0) #订单状态 0等待付款 1付款成功 2已送货 3交易完成 4已取消
-    ordered = db.IntegerField(default = int(time.time())) #下单时间
-    
-    class Meta:
-        db_table = 'orders'
-    
-#订单内容
-class OrderItem(db.Model):
-    oid = db.IntegerField() #订单Id
-    sid = db.IntegerField() #商品Id
-    said = db.IntegerField() #商品规格Id
-    num = db.TinyIntegerField(default = 0) #数量
-    
-    class Meta:
-        db_table = 'orderitems'
 
-#静态页面
+class Order(db.Model):
+    """
+    订单
+    """
+    id = db.PrimaryKeyField()
+    uid = db.IntegerField(default=0) # 用户Id
+    mobile = db.CharField(max_length=11) # 注册手机号
+    uaid = db.IntegerField(default=0) # 收件地址
+    distrid = db.TinyIntegerField(default=0) # 配送方式
+    distribbed = db.CharField(max_length=24) # 配送时间
+    payment = db.TinyIntegerField(default=1) # 付款方式 0货到付款  1支付宝
+    message = db.CharField() # 付款留言
+    isinvoice = db.TinyIntegerField(default=0) # 是否开发票
+    invoicesub = db.TinyIntegerField(default=0) # 发票抬头 0个人 1公司
+    invoicename = db.CharField(max_length=80) # 个人或公司名称
+    invoicecontent = db.TinyIntegerField(default=1) # 发票类型 0蛋糕 1食品
+    shippingprice = db.FloatField(default=0.0) # 配送价格
+    price = db.FloatField(default=0.0) # 价格
+    status = db.TinyIntegerField(default=0) # 订单状态 0等待付款 1付款成功 2已送货 3交易完成 4已取消
+    ordered = db.IntegerField(default=int(time.time())) # 下单时间
+    
+    class Meta:
+        db_table = 'order'
+    
+
+class OrderItem(db.Model):
+    """
+    订单内容
+    """
+    oid = db.IntegerField() # 订单Id
+    sid = db.IntegerField() # 商品Id
+    said = db.IntegerField() # 商品规格Id
+    num = db.TinyIntegerField(default=0) # 数量
+    
+    class Meta:
+        db_table = 'orderitem'
+
+
 class Page(db.Model):
+    """
+    静态页面
+    """
     id = db.TinyPrimaryKeyField()
-    name = db.CharField(max_length = 20)
-    slug = db.CharField(index = True, max_length = 20) #访问路径
-    content = db.TextField() #页面内容
-    template = db.CharField(max_length = 20, default = 'staticpage.html')
+    name = db.CharField(max_length=20)
+    slug = db.CharField(index=True, max_length=20) # 访问路径
+    content = db.TextField() # 页面内容
+    template = db.CharField(max_length=20, default='staticpage.html')
     
     def validate(self):
         if self.name and self.slug:
@@ -377,67 +427,77 @@ class Page(db.Model):
             raise Exception('请输入分类名或者访问目录')
     
     class Meta:
-        db_table = 'pages'
+        db_table = 'page'
 
-#纪念日
+
 class Mark(db.Model):
+    """
+    纪念日
+    """
     id = db.PrimaryKeyField()
-    uid = db.IntegerField(default = 0) #用户Id
-    nickname = db.CharField(max_length = 10) #昵称
-    name = db.CharField(max_length = 20) #名称
-    relation = db.TinyIntegerField(max_length = 1, default = 0) #关系 0亲人 1朋友 2同事 3客户
-    gender = db.TinyIntegerField(max_length = 1, default = 0) #性别 0男 1女 2未知
-    day = db.DateField(default = datetime.date.today()) #时间
-    mobile = db.CharField(max_length = 11) #联系手机
-    created = db.IntegerField(max_length = 10, default = int(time.time())) #添加时间
+    uid = db.IntegerField(default=0) # 用户Id
+    nickname = db.CharField(max_length=10) # 昵称
+    name = db.CharField(max_length=20) # 名称
+    relation = db.TinyIntegerField(default=0) # 关系 0亲人 1朋友 2同事 3客户
+    gender = db.TinyIntegerField(default=0) # 性别 0男 1女 2未知
+    day = db.DateField(default=datetime.date.today()) # 时间
+    mobile = db.CharField(max_length=11) # 联系手机
+    created = db.IntegerField(default=int(time.time())) # 添加时间
     
     class Meta:
-        db_table = 'marks'
+        db_table = 'mark'
         order_by = ('-id',)
 
-#积分历史表
+
 class CreditLog(db.Model):
+    """
+    积分历史表
+    """
     id = db.PrimaryKeyField()
-    uid = db.IntegerField(default = 0) #用户Id
-    mobile = db.CharField(max_length = 11) #用户名
-    ctype = db.TinyIntegerField(max_length = 1) #扣分 0奖励 1扣除
-    affect = db.SmallIntegerField(max_length = 6) #积分
-    log = db.CharField(max_length = 100) #说明
-    created = db.IntegerField(max_length = 10, default = int(time.time())) #时间
+    uid = db.IntegerField(default=0) # 用户Id
+    mobile = db.CharField(max_length=11) # 用户名
+    ctype = db.TinyIntegerField() # 扣分 0奖励 1扣除
+    affect = db.SmallIntegerField() # 积分
+    log = db.CharField(max_length=100) # 说明
+    created = db.IntegerField(default=int(time.time())) # 时间
     
     class Meta:
-        db_table = 'creditlogs'
+        db_table = 'creditlog'
         order_by = ('-id',)
     
-@connect(post_save,sender=Category)
-def resetcategorys(model_class, instance,created):
-    categorys = [category for category in Category.select()]
-    memcachedb.replace('categorys', categorys, 86400)
 
-@connect(post_save,sender=Distribution)
-def resetdistributions(model_class, instance,created):
-    distributions = {}
-    for distribution in Distribution.select().dicts():
-        if distribution['pdid'] == 0:
-            distribution['list'] = []
-            distributions[distribution['id']] = distribution
-        else:
-            distributions[distribution['pdid']]['list'].append(distribution)
-    memcachedb.replace('distributions', distributions, 86400)
-
-@connect(post_save,sender=ShopAttr)
-def resetprice(model_class, instance,created):
-    prices = [shopattr.price for shopattr in ShopAttr.select(ShopAttr.price).where(ShopAttr.sid == instance.sid)]
-    prices.sort()
-    
-    if len(prices) > 1:
-        price = "%s~%s" % (str(prices[0]), str(prices[-1]))
-    else:
-        price = str(prices[0])
-    
-    Shop.update(price = price).where(Shop.id == instance.sid).execute()
-
-@connect(post_save,sender=Order)
-def setuserorders(model_class, instance, created):
-    if created:
-        User.update(order = User.order + 1).where(User.id == instance.uid).execute()
+#  @connect(post_save,sender=Category)
+#  def resetcategorys(model_class, instance,created):
+#      categorys = [category for category in Category.select()]
+#      memcachedb.replace('category', categorys, 86400)
+# 
+# 
+#  @connect(post_save,sender=Distribution)
+#  def resetdistributions(model_class, instance,created):
+#      distributions = {}
+#      for distribution in Distribution.select().dicts():
+#          if distribution['pdid'] == 0:
+#              distribution['list'] = []
+#              distributions[distribution['id']] = distribution
+#          else:
+#              distributions[distribution['pdid']]['list'].append(distribution)
+#      memcachedb.replace('distributions', distributions, 86400)
+# 
+# 
+#  @connect(post_save,sender=ShopAttr)
+#  def resetprice(model_class, instance,created):
+#      prices = [shopattr.price for shopattr in ShopAttr.select(ShopAttr.price).where(ShopAttr.sid == instance.sid)]
+#      prices.sort()
+# 
+#      if len(prices) > 1:
+#          price = "%s~%s" % (str(prices[0]), str(prices[-1]))
+#      else:
+#          price = str(prices[0])
+# 
+#      Shop.update(price = price).where(Shop.id == instance.sid).execute()
+# 
+# 
+#  @connect(post_save,sender=Order)
+#  def setuserorders(model_class, instance, created):
+#      if created:
+#          User.update(order=User.order + 1).where(User.id == instance.uid).execute()

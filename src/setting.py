@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
 DEBUG = True
 GZIP = True
 
-DB_HOST= 'localhost'
+DB_HOST= '192.168.147.151'
 DB_PORT= 3306
 DB_USER = 'root'
-DB_PASSWD = 'password'
+DB_PASSWD = 'root'
 DB_NAME = 'database'
 
-MEMCACHE_HOST = 'localhost:11211'
+MEMCACHE_HOST = '192.168.147.151:11211'
 
 ADMIN_PAGESIZE = 20
 

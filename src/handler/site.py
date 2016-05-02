@@ -1,7 +1,15 @@
-#!/usr/bin/env python
-#coding=utf8
+# -*- coding: utf-8 -*-
 
+import httplib
 import logging
+
+import datetime
+
+import time
+
+import requests
+from tornado import gen
+from tornado.httpclient import AsyncHTTPClient
 from tornado.web import HTTPError
 from handler import BaseHandler
 from lib.route import route
@@ -22,6 +30,7 @@ class IndexHandler(BaseHandler):
             shop.price = shop.price.split("~")[0]
             recomm.append(shop)
         self.render("site/index.html", ads = ads, newest = newest, recomm = recomm)
+
 
 @route(r'/apply', name='apply') #集团购买/会员特惠
 class ApplyHandler(BaseHandler):
@@ -63,6 +72,7 @@ class ApplyHandler(BaseHandler):
             self.flash(str(ex))
         
         self.render("site/apply.html")
+
 
 @route(r'/signin', name='signin') #登录
 class SignInHandler(BaseHandler):
